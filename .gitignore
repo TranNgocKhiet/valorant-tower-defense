@@ -1,0 +1,36 @@
+# --- Unity Folders to Ignore ---
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[MemoryCaptures]/
+[Uu]serSettings/
+
+# --- Asset Import Metadata (Optional but recommended) ---
+# Ignore everything in Assets/ but keep the folder structure if needed
+# Usually, we keep Assets/ but ignore specific generated files:
+*.unitypackage
+*.bundle
+
+# --- Visual Studio / IDE Files ---
+.vs/
+.vscode/
+ExportedObj/
+.consulo/
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svclog
+*.com.unity.ide.vscode
+
+# --- OS Generated Files ---
+.DS_Store
+Thumbs.db

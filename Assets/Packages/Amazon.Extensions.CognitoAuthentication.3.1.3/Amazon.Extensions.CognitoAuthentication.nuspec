@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Amazon.Extensions.CognitoAuthentication</id>
+    <version>3.1.3</version>
+    <authors>Amazon Web Services</authors>
+    <license type="file">LICENSE</license>
+    <licenseUrl>https://aka.ms/deprecateLicenseUrl</licenseUrl>
+    <icon>icon.png</icon>
+    <projectUrl>https://github.com/aws/aws-sdk-net-extensions-cognito/</projectUrl>
+    <description>An extension library to assist in the Amazon Cognito User Pools authentication process.</description>
+    <tags>AWS Amazon aws-sdk-v4 Cognito</tags>
+    <repository type="git" url="https://github.com/aws/aws-sdk-net-extensions-cognito/" />
+    <dependencies>
+      <group targetFramework="net8.0">
+        <dependency id="AWSSDK.CognitoIdentity" version="4.0.2.14" exclude="Build,Analyzers" />
+        <dependency id="AWSSDK.CognitoIdentityProvider" version="4.0.4.12" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="AWSSDK.CognitoIdentity" version="4.0.2.14" exclude="Build,Analyzers" />
+        <dependency id="AWSSDK.CognitoIdentityProvider" version="4.0.4.12" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
