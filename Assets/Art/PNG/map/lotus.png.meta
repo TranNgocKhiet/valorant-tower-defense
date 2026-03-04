@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 09ccca00819ac4043bc0fa97d2d64390
+guid: df95a15bc4c60714dbc624aaf6117826
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -7511077668876154819
-    second: lotus_0
+      213: -1917517549228059288
+    second: Lotus_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: lotus_0
+      name: Lotus_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1024
-        height: 572
+        width: 2752
+        height: 1536
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d388442d7aa43c790800000000000000
-      internalID: -7511077668876154819
+      spriteID: 8651fabc2fb9365e0800000000000000
+      internalID: -1917517549228059288
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      lotus_0: -7511077668876154819
+      Lotus_0: -1917517549228059288
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

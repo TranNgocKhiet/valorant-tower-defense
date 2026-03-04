@@ -17,6 +17,9 @@ public class LevelManager : MonoBehaviour
     [Header("Multiple Paths Setup")]
     public EnemyPath[] enemyPaths;
 
+    [Header("Attributes")]
+    public int totalWaves = 5;
+
     [Header("Menu panel")]
     public GameObject endGamePanel;
     public GameObject pauseMenuPanel;
@@ -57,20 +60,20 @@ public class LevelManager : MonoBehaviour
         currentWave = waveNumber;
         UpdateWaveUI();
 
-        if (currentWave > enemyPaths.Length)
+        if (currentWave > totalWaves)
         {
             WinLevel();
             return null;
         }
 
-        return enemyPaths[currentWave - 1];
+        return enemyPaths[Random.Range(0, enemyPaths.Length)];
     }
 
     private void UpdateWaveUI()
     {
         if (waveText != null)
         {
-            waveText.text = currentWave + " / " + enemyPaths.Length;
+            waveText.text = currentWave + " / " + totalWaves;
         }
     }
 
@@ -162,7 +165,7 @@ public class LevelManager : MonoBehaviour
 
     public void Retry() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     public void GoToLevelSelect() => SceneManager.LoadScene("LevelChooseScene");
-    public void NextLevel() => SceneManager.LoadScene("LevelTwoScene");
+    public void NextLevel() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
 
 }
 
