@@ -162,7 +162,7 @@ public class LevelManager : MonoBehaviour
 
     public void Retry() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     public void GoToLevelSelect() => SceneManager.LoadScene("LevelChooseScene");
-    public void NextLevel() => SceneManager.LoadScene("LevelTwoScene");
+    public void NextLevel() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
 
 }
 

@@ -34,6 +34,21 @@ public class MenuNavigator : MonoBehaviour
         SceneManager.LoadScene("LevelTwoScene");
     }
 
+    public void GoToLevelThree()
+    {
+        SceneManager.LoadScene("LevelThreeScene");
+    }
+
+    public void GoToLevelFour()
+    {
+        SceneManager.LoadScene("LevelFourScene");
+    }
+
+    public void GoToLevelFive()
+    {
+        SceneManager.LoadScene("LevelFiveScene");
+    }
+
     public void GoToLogin()
     {
         SceneManager.LoadScene("LoginScene");
