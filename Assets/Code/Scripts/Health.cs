@@ -8,6 +8,11 @@ public class Health : MonoBehaviour
 
     private bool isDestroyed = false;
 
+    public void Initialize(int hp)
+    {
+        hitPoints = hp;
+    }
+
     public void TakeDamage(int damage)
     {
         hitPoints -= damage;

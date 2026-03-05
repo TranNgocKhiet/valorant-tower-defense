@@ -6672,6 +6672,7 @@ MonoBehaviour:
     - {fileID: 1224655729}
     - {fileID: 389982214}
     - {fileID: 484792528}
+  totalWaves: 5
   endGamePanel: {fileID: 615089924}
   pauseMenuPanel: {fileID: 2035358642}
   radianiteReward: 100
@@ -6705,9 +6706,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5af2ee6974694ec4dacf99a05b72252b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  enemyPrefabs:
-  - {fileID: 6477177075252808446, guid: a242074098876ee44a97d5106d266589, type: 3}
-  - {fileID: 6477177075252808446, guid: 45e7056498ecce44791a1b3279b31954, type: 3}
+  enemyData:
+  - prefab: {fileID: 6477177075252808446, guid: a242074098876ee44a97d5106d266589, type: 3}
+    moveSpeed: 1
+    health: 4
+    attackDamage: 1
+    spawnWeight: 1
+  - prefab: {fileID: 6477177075252808446, guid: 45e7056498ecce44791a1b3279b31954, type: 3}
+    moveSpeed: 0.5
+    health: 8
+    attackDamage: 3
+    spawnWeight: 1
   baseEnemies: 8
   enemiesPerSec: 0.5
   timeBetweenWaves: 5
