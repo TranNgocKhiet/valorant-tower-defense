@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d3011673c729beb43b14db630e8ae440
+guid: ed8b26fb75ae05a41810ae1ddd28f418
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3128073246415528423
-    second: reyna_0
+      213: 6891741100077766612
+    second: Plot_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: reyna_0
+      name: Plot_0
       rect:
         serializedVersion: 2
-        x: 194
-        y: 182
-        width: 53
-        height: 77
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+        x: 52
+        y: 58
+        width: 920
+        height: 771
+      alignment: 9
+      pivot: {x: 0.50687295, y: 0.5710768}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 91edff3a4f9d694d0800000000000000
-      internalID: -3128073246415528423
+      spriteID: 4d7581a340264af50800000000000000
+      internalID: 6891741100077766612
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 7e9731a9e984a284ca7fcaa726620d3b
+    spriteID: 8be13656baab6534c89bed7eadd89073
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      reyna_0: -3128073246415528423
+      Plot_0: 6891741100077766612
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
