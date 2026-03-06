@@ -29,6 +29,8 @@ public class LevelManager : MonoBehaviour
 
     [Header("UI Popups")]
     public TextMeshProUGUI rewardPopupText;
+    [Tooltip("Starting currency for level 1. Carried-over currency is used from level 2 onwards.")]
+    [SerializeField] private int defaultCurrency = 300;
 
     public int currency;
     public int levelHealth;
@@ -50,8 +52,9 @@ public class LevelManager : MonoBehaviour
         if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
         if (endGamePanel != null) endGamePanel.SetActive(false);
 
-        currency = 300;
-        levelHealth = 10;
+        currency = PlayerPrefs.HasKey("LevelCurrency")
+            ? PlayerPrefs.GetInt("LevelCurrency")
+            : defaultCurrency;
         endGamePanel.SetActive(false);
     }
 
@@ -163,8 +166,17 @@ public class LevelManager : MonoBehaviour
 
     }
 
-    public void Retry() => SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    public void GoToLevelSelect() => SceneManager.LoadScene("LevelChooseScene");
+    public void Retry()
+    {
+        PlayerPrefs.DeleteKey("LevelCurrency");
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    public void GoToLevelSelect()
+    {
+        PlayerPrefs.DeleteKey("LevelCurrency");
+        SceneManager.LoadScene("LevelChooseScene");
+    }
     public void NextLevel() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
 
 }

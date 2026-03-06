@@ -16,6 +16,8 @@ public class EnemySpawnData
     public int attackDamage = 1;
     [Tooltip("Relative spawn weight (higher = spawns more often)")]
     public int spawnWeight = 1;
+    [Tooltip("Currency rewarded to the player when this enemy is destroyed")]
+    public int currencyReward = 50;
 }
 
 public class EnemySpawner : MonoBehaviour
@@ -102,8 +104,8 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        // 2. Select enemy type by spawn weight
-        EnemySpawnData selectedData = GetWeightedRandomEnemy();
+        // 2. Select enemy type: always use first entry for wave 1, weighted random afterwards
+        EnemySpawnData selectedData = (currentWave < 2) ? enemyData[0] : GetWeightedRandomEnemy();
         if (selectedData == null || selectedData.prefab == null)
         {
             Debug.LogError("No valid enemy data configured in EnemySpawner!");
@@ -124,7 +126,7 @@ public class EnemySpawner : MonoBehaviour
         Health health = enemy.GetComponent<Health>();
         if (health != null)
         {
-            health.Initialize(selectedData.health);
+            health.Initialize(selectedData.health, selectedData.currencyReward);
         }
     }
 

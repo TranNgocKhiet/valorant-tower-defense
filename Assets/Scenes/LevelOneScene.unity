@@ -1381,7 +1381,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -37, y: 288}
+  m_AnchoredPosition: {x: 5, y: 218}
   m_SizeDelta: {x: 130, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &420926903
@@ -2666,7 +2666,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 716.4, y: 284}
+  m_AnchoredPosition: {x: 531.2001, y: 211}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &666789829
@@ -3406,7 +3406,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 719.19995, y: 173}
+  m_AnchoredPosition: {x: 534, y: 100}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &853610874
@@ -5537,7 +5537,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 719.2, y: 231}
+  m_AnchoredPosition: {x: 534.00006, y: 158}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1223353627
@@ -6505,6 +6505,7 @@ MonoBehaviour:
     - {fileID: 2092480121}
     - {fileID: 1014778709}
     - {fileID: 532904700}
+  totalWaves: 2
   endGamePanel: {fileID: 615089924}
   pauseMenuPanel: {fileID: 2035358642}
   radianiteReward: 100
@@ -6538,10 +6539,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5af2ee6974694ec4dacf99a05b72252b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  enemyPrefabs:
-  - {fileID: 6477177075252808446, guid: a242074098876ee44a97d5106d266589, type: 3}
-  - {fileID: 6477177075252808446, guid: 45e7056498ecce44791a1b3279b31954, type: 3}
-  baseEnemies: 8
+  enemyData:
+  - prefab: {fileID: 6477177075252808446, guid: a242074098876ee44a97d5106d266589, type: 3}
+    moveSpeed: 0.75
+    health: 2
+    attackDamage: 2
+    spawnWeight: 1
+    currencyReward: 10
+  baseEnemies: 5
   enemiesPerSec: 0.5
   timeBetweenWaves: 5
   difficultyScalingFactor: 0.75
@@ -6877,7 +6882,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 551.1, y: 285.4}
+  m_AnchoredPosition: {x: 365.90002, y: 212.4}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1491098693
@@ -7449,7 +7454,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 93, y: 288}
+  m_AnchoredPosition: {x: 135, y: 218}
   m_SizeDelta: {x: 130, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1587575916

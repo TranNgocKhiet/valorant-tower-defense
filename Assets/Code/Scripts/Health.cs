@@ -8,9 +8,10 @@ public class Health : MonoBehaviour
 
     private bool isDestroyed = false;
 
-    public void Initialize(int hp)
+    public void Initialize(int hp, int reward)
     {
         hitPoints = hp;
+        rewardOnDestroy = reward;
     }
 
     public void TakeDamage(int damage)
