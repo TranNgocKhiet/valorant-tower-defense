@@ -52,12 +52,14 @@ public class AWSLoginManager : MonoBehaviour
             if (authResponse.AuthenticationResult != null)
             {
                 string idToken = authResponse.AuthenticationResult.IdToken;
+                string refreshToken = authResponse.AuthenticationResult.RefreshToken;
                 string enteredUsername = UsernameField.text; // Grab the name
 
                 // Inside the success block
                 UnityMainThreadDispatcher.Instance().Enqueue(() => {
-                    // 1. Save the username locally for subsequent requests
+                    // 1. Save the username and refresh token locally for subsequent requests
                     PlayerPrefs.SetString("Username", enteredUsername);
+                    PlayerPrefs.SetString("RefreshToken", refreshToken);
                     PlayerPrefs.Save();
 
                     // 2. Find the CloudDataManager and trigger the load

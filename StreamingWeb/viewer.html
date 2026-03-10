@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Stream Viewer</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+
+      .container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 1200px;
+        width: 100%;
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      .status {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-top: 10px;
+      }
+
+      .status.waiting {
+        background: #fbbf24;
+        color: #78350f;
+      }
+
+      .status.streaming {
+        background: #10b981;
+        color: white;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        padding: 30px;
+      }
+
+      .video-section {
+        background: #1f2937;
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        aspect-ratio: 16/9;
+      }
+
+      #gameFrame {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: #111827;
+      }
+
+      .placeholder {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #9ca3af;
+      }
+
+      .placeholder-icon {
+        font-size: 4em;
+        margin-bottom: 20px;
+      }
+
+      .stats-section {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .stat-card {
+        background: #f3f4f6;
+        border-radius: 12px;
+        padding: 20px;
+        border-left: 4px solid #667eea;
+      }
+
+      .stat-card h3 {
+        color: #4b5563;
+        font-size: 0.9em;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+      }
+
+      .stat-value {
+        font-size: 2em;
+        font-weight: bold;
+        color: #1f2937;
+      }
+
+      .game-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .game-stat {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .game-stat-label {
+        color: #6b7280;
+        font-size: 0.85em;
+        margin-bottom: 5px;
+      }
+
+      .game-stat-value {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #667eea;
+      }
+
+      .session-info {
+        background: #fef3c7;
+        border-left: 4px solid #f59e0b;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+      }
+
+      .session-info p {
+        color: #78350f;
+        font-size: 0.9em;
+        margin: 5px 0;
+      }
+
+      .fps-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: #10b981;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 0.9em;
+      }
+
+      @media (max-width: 768px) {
+        .content {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🎮 Game Stream Viewer</h1>
+        <div class="status waiting" id="status">⏳ Waiting for stream...</div>
+      </div>
+
+      <div class="content">
+        <div class="video-section">
+          <img id="gameFrame" style="display: none" alt="Game Stream" />
+          <div class="placeholder" id="placeholder">
+            <div class="placeholder-icon">📺</div>
+            <p>Waiting for game stream to start...</p>
+            <p style="font-size: 0.9em; margin-top: 10px">
+              Start streaming from Unity to see the game here
+            </p>
+          </div>
+          <div class="fps-indicator" id="fpsIndicator" style="display: none">
+            0 FPS
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <div class="stat-card">
+            <h3>Session Duration</h3>
+            <div class="stat-value" id="duration">00:00:00</div>
+          </div>
+
+          <div class="stat-card">
+            <h3>Frames Received</h3>
+            <div class="stat-value" id="frameCount">0</div>
+          </div>
+
+          <div class="stat-card">
+            <h3>Game State</h3>
+            <div class="game-stats">
+              <div class="game-stat">
+                <div class="game-stat-label">Wave</div>
+                <div class="game-stat-value" id="wave">-</div>
+              </div>
+              <div class="game-stat">
+                <div class="game-stat-label">Enemies</div>
+                <div class="game-stat-value" id="enemies">-</div>
+              </div>
+              <div class="game-stat">
+                <div class="game-stat-label">Towers</div>
+                <div class="game-stat-value" id="towers">-</div>
+              </div>
+              <div class="game-stat">
+                <div class="game-stat-label">Health</div>
+                <div class="game-stat-value" id="health">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="session-info" id="sessionInfo" style="display: none">
+            <p><strong>Session ID:</strong> <span id="sessionId">-</span></p>
+            <p><strong>Player ID:</strong> <span id="playerId">-</span></p>
+            <p>
+              <strong>Game Version:</strong> <span id="gameVersion">-</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let frameCount = 0;
+      let sessionStartTime = null;
+      let lastFrameTime = Date.now();
+      let fpsCounter = 0;
+      let fpsInterval = null;
+
+      // Connect to server via polling (in production, use WebSockets)
+      function connectToStream() {
+        // Poll for latest frame every 33ms (~30 FPS max)
+        setInterval(fetchLatestFrame, 33);
+
+        // Update FPS counter every second
+        fpsInterval = setInterval(updateFPS, 1000);
+      }
+
+      async function fetchLatestFrame() {
+        try {
+          const response = await fetch("http://localhost:3000/stream/latest");
+          if (response.ok) {
+            const data = await response.json();
+            if (data.frame) {
+              displayFrame(data.frame);
+            }
+          }
+        } catch (error) {
+          // Server not ready yet, keep trying
+        }
+      }
+
+      function displayFrame(frame) {
+        // Update status
+        const status = document.getElementById("status");
+        status.textContent = "🔴 LIVE";
+        status.className = "status streaming";
+
+        // Show frame - check multiple possible property names
+        const gameFrame = document.getElementById("gameFrame");
+        const placeholder = document.getElementById("placeholder");
+
+        const visualData =
+          frame.visualData ||
+          frame.VisualData ||
+          frame.visualDataBase64 ||
+          frame.VisualDataBase64;
+
+        if (visualData) {
+          gameFrame.src = `data:image/jpeg;base64,${visualData}`;
+          gameFrame.style.display = "block";
+          placeholder.style.display = "none";
+        } else {
+          console.warn(
+            "No visual data found in frame. Keys:",
+            Object.keys(frame),
+          );
+        }
+
+        // Update frame count
+        frameCount++;
+        document.getElementById("frameCount").textContent =
+          frameCount.toLocaleString();
+
+        // Update FPS
+        fpsCounter++;
+        document.getElementById("fpsIndicator").style.display = "block";
+
+        // Update game stats
+        const metadata = frame.metadata || frame.Metadata;
+        if (metadata) {
+          const m = metadata;
+          document.getElementById("wave").textContent =
+            m.currentWave || m.CurrentWave || 0;
+          document.getElementById("enemies").textContent =
+            m.enemyCount || m.EnemyCount || 0;
+          document.getElementById("towers").textContent =
+            m.towerCount || m.TowerCount || 0;
+          document.getElementById("health").textContent =
+            m.playerHealth || m.PlayerHealth || 0;
+        }
+
+        // Update session info
+        if (frame.sessionId && !sessionStartTime) {
+          sessionStartTime = new Date();
+          document.getElementById("sessionInfo").style.display = "block";
+          document.getElementById("sessionId").textContent =
+            frame.sessionId || "-";
+        }
+
+        // Start duration timer if not already started
+        if (!window.durationInterval) {
+          window.durationInterval = setInterval(updateDuration, 1000);
+        }
+      }
+
+      function updateFPS() {
+        document.getElementById("fpsIndicator").textContent =
+          `${fpsCounter} FPS`;
+        fpsCounter = 0;
+      }
+
+      function updateDuration() {
+        if (!sessionStartTime) return;
+
+        const now = new Date();
+        const diff = Math.floor((now - sessionStartTime) / 1000);
+
+        const hours = Math.floor(diff / 3600);
+        const minutes = Math.floor((diff % 3600) / 60);
+        const seconds = diff % 60;
+
+        const formatted = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+        document.getElementById("duration").textContent = formatted;
+      }
+
+      // Start connection
+      connectToStream();
+    </script>
+  </body>
+</html>
