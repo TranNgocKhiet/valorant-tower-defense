@@ -6539,10 +6539,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5af2ee6974694ec4dacf99a05b72252b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  enemyPrefabs:
-  - {fileID: 6477177075252808446, guid: a242074098876ee44a97d5106d266589, type: 3}
-  - {fileID: 6477177075252808446, guid: 45e7056498ecce44791a1b3279b31954, type: 3}
-  baseEnemies: 8
+  enemyData:
+  - prefab: {fileID: 6477177075252808446, guid: a242074098876ee44a97d5106d266589, type: 3}
+    moveSpeed: 0.75
+    health: 2
+    attackDamage: 2
+    spawnWeight: 1
+    currencyReward: 10
+  baseEnemies: 5
   enemiesPerSec: 0.5
   timeBetweenWaves: 5
   difficultyScalingFactor: 0.75

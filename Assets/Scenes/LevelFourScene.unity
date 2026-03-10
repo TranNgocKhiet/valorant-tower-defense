@@ -1510,7 +1510,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -34, y: 292}
+  m_AnchoredPosition: {x: -34, y: 219}
   m_SizeDelta: {x: 130, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &420926903
@@ -2845,7 +2845,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 719.4, y: 288}
+  m_AnchoredPosition: {x: 532, y: 212}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &666789829
@@ -3587,7 +3587,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 722.9, y: 180.70001}
+  m_AnchoredPosition: {x: 535.5, y: 104.70001}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &853610874
@@ -5678,7 +5678,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 722.9, y: 238.7}
+  m_AnchoredPosition: {x: 535.5, y: 162.7}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1223353627
@@ -6672,12 +6672,13 @@ MonoBehaviour:
     - {fileID: 1224655729}
     - {fileID: 389982214}
     - {fileID: 484792528}
+  totalWaves: 5
   endGamePanel: {fileID: 615089924}
   pauseMenuPanel: {fileID: 2035358642}
   radianiteReward: 100
   rewardPopupText: {fileID: 804675611}
   currency: 200
-  levelHealth: 10
+  levelHealth: 20
 --- !u!4 &1342359748
 Transform:
   m_ObjectHideFlags: 0
@@ -6705,9 +6706,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5af2ee6974694ec4dacf99a05b72252b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  enemyPrefabs:
-  - {fileID: 6477177075252808446, guid: a242074098876ee44a97d5106d266589, type: 3}
-  - {fileID: 6477177075252808446, guid: 45e7056498ecce44791a1b3279b31954, type: 3}
+  enemyData:
+  - prefab: {fileID: 6477177075252808446, guid: a242074098876ee44a97d5106d266589, type: 3}
+    moveSpeed: 1
+    health: 3
+    attackDamage: 2
+    spawnWeight: 1
+    currencyReward: 25
+  - prefab: {fileID: 6477177075252808446, guid: 45e7056498ecce44791a1b3279b31954, type: 3}
+    moveSpeed: 0.5
+    health: 5
+    attackDamage: 3
+    spawnWeight: 1
+    currencyReward: 50
   baseEnemies: 8
   enemiesPerSec: 0.5
   timeBetweenWaves: 5
@@ -7205,7 +7216,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 537, y: 288}
+  m_AnchoredPosition: {x: 349.59998, y: 212}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1491098693
@@ -7775,7 +7786,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 96, y: 292}
+  m_AnchoredPosition: {x: 96, y: 219}
   m_SizeDelta: {x: 130, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1587575916

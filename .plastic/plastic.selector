@@ -1,3 +1,0 @@
-repository "tower_defense/tower_defense@18968363774481@cloud"
-  path "/"
-    smartbranch "/main"
