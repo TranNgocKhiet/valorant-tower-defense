@@ -1381,7 +1381,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 5, y: 218}
+  m_AnchoredPosition: {x: -191, y: 674}
   m_SizeDelta: {x: 130, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &420926903
@@ -2666,7 +2666,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 531.2001, y: 211}
+  m_AnchoredPosition: {x: 1187.2001, y: 660}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &666789829
@@ -3406,7 +3406,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 534, y: 100}
+  m_AnchoredPosition: {x: 284, y: 674}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &853610874
@@ -3495,7 +3495,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: 142.49951, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -5537,7 +5537,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 534.00006, y: 158}
+  m_AnchoredPosition: {x: 139, y: 674}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1223353627
@@ -5626,7 +5626,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: 77.13281, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -6505,7 +6505,7 @@ MonoBehaviour:
     - {fileID: 2092480121}
     - {fileID: 1014778709}
     - {fileID: 532904700}
-  totalWaves: 2
+  totalWaves: 5
   endGamePanel: {fileID: 615089924}
   pauseMenuPanel: {fileID: 2035358642}
   radianiteReward: 100
@@ -6882,7 +6882,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 365.90002, y: 212.4}
+  m_AnchoredPosition: {x: 1021.9, y: 661.4}
   m_SizeDelta: {x: 100, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1491098693
@@ -7454,7 +7454,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 135, y: 218}
+  m_AnchoredPosition: {x: -61, y: 674}
   m_SizeDelta: {x: 130, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1587575916
