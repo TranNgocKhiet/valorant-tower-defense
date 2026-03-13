@@ -97,9 +97,6 @@ public class LevelManager : MonoBehaviour
         endText.color = Color.cyan;
         nextLevelButton.interactable = true;
         
-        PlayerPrefs.SetInt("LevelCurrency", currency);
-        PlayerPrefs.Save();
-        
         GiveLevelReward();
     }
 

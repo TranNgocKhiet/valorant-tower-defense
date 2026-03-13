@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: d3011673c729beb43b14db630e8ae440
+guid: f713861703a4d5a4bb4fdc02c2c0260c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3128073246415528423
-    second: reyna_0
+      213: -5103930680202240213
+    second: Reyna button_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,23 +100,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: reyna_0
+      name: Reyna button_0
       rect:
         serializedVersion: 2
-        x: 194
-        y: 182
-        width: 53
-        height: 77
+        x: 261
+        y: 197
+        width: 527
+        height: 136
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 91edff3a4f9d694d0800000000000000
-      internalID: -3128073246415528423
+      spriteID: b2fd35096123b29b0800000000000000
+      internalID: -5103930680202240213
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 7e9731a9e984a284ca7fcaa726620d3b
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      reyna_0: -3128073246415528423
+      Reyna button_0: -5103930680202240213
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -2,10 +2,28 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
+[System.Serializable]
+public class EnemySpawnData
+{
+    public GameObject prefab;
+
+    [Header("Attributes")]
+    [Tooltip("Movement speed of this enemy type")]
+    public float moveSpeed = 2f;
+    [Tooltip("Hit points for this enemy type")]
+    public int health = 2;
+    [Tooltip("Damage dealt to the base when this enemy reaches the end")]
+    public int attackDamage = 1;
+    [Tooltip("Relative spawn weight (higher = spawns more often)")]
+    public int spawnWeight = 1;
+    [Tooltip("Currency rewarded to the player when this enemy is destroyed")]
+    public int currencyReward = 50;
+}
+
 public class EnemySpawner : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private GameObject[] enemyPrefabs;
+    [SerializeField] private EnemySpawnData[] enemyData;
 
     [Header("Attributes")]
     [SerializeField] private int baseEnemies = 8;
@@ -86,19 +104,52 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        // 2. Select the prefab to spawn
-        GameObject prefabToSpawn = (currentWave < 2) ? enemyPrefabs[0] : enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
+        // 2. Select enemy type: always use first entry for wave 1, weighted random afterwards
+        EnemySpawnData selectedData = (currentWave < 2) ? enemyData[0] : GetWeightedRandomEnemy();
+        if (selectedData == null || selectedData.prefab == null)
+        {
+            Debug.LogError("No valid enemy data configured in EnemySpawner!");
+            return;
+        }
 
         // 3. Instantiate at the specific path's start point
-        GameObject enemy = Instantiate(prefabToSpawn, selectedPath.startPoint.position, Quaternion.identity);
+        GameObject enemy = Instantiate(selectedData.prefab, selectedPath.startPoint.position, Quaternion.identity);
 
-        // 4. Assign the specific waypoints to the enemy movement script
-        // Assuming your movement script is named EnemyMovement (or similar)
+        // 4. Apply per-type attributes
         EnemyMovement movement = enemy.GetComponent<EnemyMovement>();
         if (movement != null)
         {
             movement.SetPath(selectedPath.waypoints);
+            movement.SetAttributes(selectedData.moveSpeed, selectedData.attackDamage);
         }
+
+        Health health = enemy.GetComponent<Health>();
+        if (health != null)
+        {
+            health.Initialize(selectedData.health, selectedData.currencyReward);
+        }
+    }
+
+    private EnemySpawnData GetWeightedRandomEnemy()
+    {
+        if (enemyData == null || enemyData.Length == 0) return null;
+
+        int totalWeight = 0;
+        foreach (EnemySpawnData data in enemyData)
+            totalWeight += Mathf.Max(0, data.spawnWeight);
+
+        if (totalWeight <= 0)
+            return enemyData[Random.Range(0, enemyData.Length)];
+
+        int roll = Random.Range(0, totalWeight);
+        int cumulative = 0;
+        foreach (EnemySpawnData data in enemyData)
+        {
+            cumulative += Mathf.Max(0, data.spawnWeight);
+            if (roll < cumulative)
+                return data;
+        }
+        return enemyData[enemyData.Length - 1];
     }
 
     private int EnemiesPerWave()

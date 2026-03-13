@@ -12,6 +12,7 @@ public class EnemyMovement : MonoBehaviour
 
     [Header("Attributes")]
     [SerializeField] public float moveSpeed = 2f;
+    [SerializeField] private int attackDamage = 1;
 
     private Transform[] waypoints; // Local copy of the specific path for THIS enemy
     private Transform target;
@@ -51,7 +52,7 @@ public class EnemyMovement : MonoBehaviour
             {
                 EnemySpawner.onEnemyDestroy.Invoke();
                 Destroy(gameObject);
-                LevelManager.main.DecreaseHealth(1);
+                LevelManager.main.DecreaseHealth(attackDamage);
                 return;
             }
             else
@@ -67,6 +68,13 @@ public class EnemyMovement : MonoBehaviour
 
         Vector2 direction = (target.position - transform.position).normalized;
         rb.linearVelocity = direction * moveSpeed;
+    }
+
+    public void SetAttributes(float speed, int damage)
+    {
+        moveSpeed = speed;
+        baseSpeed = speed;
+        attackDamage = damage;
     }
 
     public void UpdateSpeed(float newSpeed)
