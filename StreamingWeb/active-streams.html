@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Active Streams</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .header {
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5em;
+        color: #667eea;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        color: #666;
+        font-size: 1.1em;
+      }
+
+      .refresh-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 15px;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .refresh-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+      }
+
+      .refresh-btn:active {
+        transform: translateY(0);
+      }
+
+      .streams-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+      }
+
+      .stream-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition:
+          transform 0.3s,
+          box-shadow 0.3s;
+        cursor: pointer;
+      }
+
+      .stream-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .stream-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .streamer-name {
+        font-size: 1.4em;
+        font-weight: bold;
+        color: #333;
+      }
+
+      .live-badge {
+        background: #ef4444;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.85em;
+        font-weight: bold;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.7;
+        }
+      }
+
+      .stream-info {
+        margin-bottom: 10px;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        color: #666;
+      }
+
+      .info-label {
+        font-weight: 600;
+        color: #333;
+      }
+
+      .info-value {
+        color: #667eea;
+        font-weight: 500;
+      }
+
+      .stream-domain {
+        background: #f3f4f6;
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 15px;
+        font-family: monospace;
+        font-size: 0.9em;
+        color: #555;
+        word-break: break-all;
+      }
+
+      .watch-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        margin-top: 15px;
+        transition: transform 0.2s;
+      }
+
+      .watch-btn:hover {
+        transform: scale(1.02);
+      }
+
+      .watch-btn:active {
+        transform: scale(0.98);
+      }
+
+      .no-streams {
+        background: white;
+        border-radius: 15px;
+        padding: 60px 30px;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      }
+
+      .no-streams h2 {
+        color: #667eea;
+        font-size: 2em;
+        margin-bottom: 15px;
+      }
+
+      .no-streams p {
+        color: #666;
+        font-size: 1.2em;
+      }
+
+      .loading {
+        text-align: center;
+        padding: 60px;
+        color: white;
+        font-size: 1.5em;
+      }
+
+      .loading::after {
+        content: "...";
+        animation: dots 1.5s steps(4, end) infinite;
+      }
+
+      @keyframes dots {
+        0%,
+        20% {
+          content: ".";
+        }
+        40% {
+          content: "..";
+        }
+        60%,
+        100% {
+          content: "...";
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🎮 Active Game Streams</h1>
+        <p>Watch live gameplay from other players</p>
+        <button class="refresh-btn" onclick="loadActiveStreams()">
+          🔄 Refresh
+        </button>
+      </div>
+
+      <div id="streamsContainer" class="loading">Loading streams</div>
+    </div>
+
+    <script>
+      // Production API URL - change this to your API Gateway endpoint
+      const API_URL = "/active-streams";
+      // For local testing: "http://localhost:3000/active-streams"
+
+      async function loadActiveStreams() {
+        const container = document.getElementById("streamsContainer");
+        container.className = "loading";
+        container.textContent = "Loading streams";
+
+        try {
+          const response = await fetch(API_URL);
+          const data = await response.json();
+
+          if (!data.streams || data.streams.length === 0) {
+            showNoStreams();
+            return;
+          }
+
+          displayStreams(data.streams);
+        } catch (error) {
+          console.error("Failed to load streams:", error);
+          container.className = "no-streams";
+          container.innerHTML = `
+            <h2>⚠️ Error Loading Streams</h2>
+            <p>Failed to connect to the server. Please try again later.</p>
+          `;
+        }
+      }
+
+      function showNoStreams() {
+        const container = document.getElementById("streamsContainer");
+        container.className = "no-streams";
+        container.innerHTML = `
+          <h2>📺 No Active Streams</h2>
+          <p>No one is streaming right now. Check back later!</p>
+        `;
+      }
+
+      function displayStreams(streams) {
+        const container = document.getElementById("streamsContainer");
+        container.className = "streams-grid";
+        container.innerHTML = "";
+
+        streams.forEach((stream) => {
+          const card = createStreamCard(stream);
+          container.appendChild(card);
+        });
+      }
+
+      function createStreamCard(stream) {
+        const card = document.createElement("div");
+        card.className = "stream-card";
+
+        const startTime = new Date(stream.StreamStartTime);
+        const duration = Math.floor((Date.now() - startTime.getTime()) / 1000);
+        const durationStr = formatDuration(duration);
+
+        card.innerHTML = `
+          <div class="stream-header">
+            <div class="streamer-name">${escapeHtml(stream.PlayerID)}</div>
+            <div class="live-badge">🔴 LIVE</div>
+          </div>
+          
+          <div class="stream-info">
+            <div class="info-row">
+              <span class="info-label">Level:</span>
+              <span class="info-value">Level ${stream.CurrentLevel}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Duration:</span>
+              <span class="info-value">${durationStr}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Started:</span>
+              <span class="info-value">${startTime.toLocaleTimeString()}</span>
+            </div>
+          </div>
+          
+          <div class="stream-domain">
+            ${escapeHtml(stream.StreamDomain)}
+          </div>
+          
+          <button class="watch-btn" onclick="watchStream('${escapeHtml(
+            stream.StreamDomain,
+          )}')">
+            ▶️ Watch Stream
+          </button>
+        `;
+
+        return card;
+      }
+
+      function formatDuration(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+
+        if (hours > 0) {
+          return `${hours}h ${minutes}m`;
+        } else if (minutes > 0) {
+          return `${minutes}m ${secs}s`;
+        } else {
+          return `${secs}s`;
+        }
+      }
+
+      function watchStream(streamDomain) {
+        // Redirect to viewer page with stream domain parameter
+        window.location.href = `viewer.html?stream=${encodeURIComponent(
+          streamDomain,
+        )}`;
+      }
+
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Load streams on page load
+      loadActiveStreams();
+
+      // Auto-refresh every 10 seconds
+      setInterval(loadActiveStreams, 10000);
+    </script>
+  </body>
+</html>

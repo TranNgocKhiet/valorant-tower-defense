@@ -5,6 +5,7 @@ namespace TowerDefense.Streaming.Models
     /// </summary>
     public class EncodedFrame
     {
+        public string streamDomain { get; set; }
         /// <summary>Unique sequence number for frame ordering.</summary>
         public long SequenceNumber { get; set; }
         

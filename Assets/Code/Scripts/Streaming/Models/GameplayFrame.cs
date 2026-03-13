@@ -7,6 +7,7 @@ namespace TowerDefense.Streaming.Models
     /// </summary>
     public class GameplayFrame
     {
+        public string StreamDomain { get; set; }
         /// <summary>Unique sequence number for frame ordering.</summary>
         public long SequenceNumber { get; set; }
         
