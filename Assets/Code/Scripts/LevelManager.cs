@@ -19,7 +19,6 @@ public class LevelManager : MonoBehaviour
 
     [Header("Attributes")]
     public int totalWaves = 5;
-    public int startingLevelHealth = 10;
 
     [Header("Menu panel")]
     public GameObject endGamePanel;
@@ -52,7 +51,7 @@ public class LevelManager : MonoBehaviour
         if (endGamePanel != null) endGamePanel.SetActive(false);
 
         currency = 300;
-        levelHealth = startingLevelHealth;
+        levelHealth = 10;
         endGamePanel.SetActive(false);
     }
 
