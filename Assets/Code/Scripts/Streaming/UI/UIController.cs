@@ -24,6 +24,7 @@ namespace TowerDefense.Streaming.UI
         #region Private Fields
         
         private bool _needsStreamManagerRefresh = false;
+        private bool _wasStreaming = false; // Track if we were streaming to show end message
         
         #endregion
         
@@ -188,8 +189,24 @@ namespace TowerDefense.Streaming.UI
                 connectionStateText.text = $"Status: {GetConnectionStateDisplayText(state)}";
             }
             
+            // Track streaming state changes
+            bool isCurrentlyStreaming = (state == ConnectionState.Streaming);
+            
+            // If we were streaming and now we're idle, show "Stream has ended" message
+            if (_wasStreaming && state == ConnectionState.Idle)
+            {
+                ShowSuccessMessage("Stream has ended");
+                _wasStreaming = false;
+            }
+            else if (isCurrentlyStreaming)
+            {
+                _wasStreaming = true;
+                // Hide any previous messages when starting to stream
+                HideError();
+            }
+            
             // Update streaming indicator based on state
-            UpdateStreamingIndicator(state == ConnectionState.Streaming);
+            UpdateStreamingIndicator(isCurrentlyStreaming);
         }
         
         /// <summary>
@@ -230,6 +247,19 @@ namespace TowerDefense.Streaming.UI
             if (errorNotificationPanel != null && errorMessageText != null)
             {
                 errorMessageText.text = errorMessage;
+                errorNotificationPanel.SetActive(true);
+            }
+        }
+        
+        /// <summary>
+        /// Displays a success notification to the player.
+        /// </summary>
+        /// <param name="message">The success message to display.</param>
+        public void ShowSuccessMessage(string message)
+        {
+            if (errorNotificationPanel != null && errorMessageText != null)
+            {
+                errorMessageText.text = message;
                 errorNotificationPanel.SetActive(true);
             }
         }
