@@ -146,125 +146,78 @@ namespace TowerDefense.Streaming.Services
         }
 
         /// <summary>
-        /// Captures frame data after all rendering including UI overlays.
-        /// Uses ReadPixels to capture the final rendered frame.
+        /// Captures frame data from the camera using RenderTexture.
         /// </summary>
         /// <returns>JPEG encoded frame data.</returns>
         private byte[] CaptureFrameData()
         {
+            // Check if camera is still valid (not destroyed during scene change)
+            if (targetCamera == null || !targetCamera.gameObject.activeInHierarchy)
+            {
+                Debug.LogWarning("FrameCaptureService: Camera destroyed or inactive, attempting to find new camera");
+                targetCamera = FindValidCamera();
+                
+                if (targetCamera == null)
+                {
+                    throw new InvalidOperationException("No valid camera found for frame capture");
+                }
+                
+                Debug.Log($"FrameCaptureService: Switched to camera '{targetCamera.name}'");
+            }
+            
+            // Store original target texture
+            RenderTexture originalTarget = targetCamera.targetTexture;
+            RenderTexture originalActive = RenderTexture.active;
+
             try
             {
-                // Read pixels from the screen after all rendering (including UI overlays)
-                // This must be called after WaitForEndOfFrame in a coroutine
-                int width = captureTexture.width;
-                int height = captureTexture.height;
-                
-                // Calculate source rect from screen
-                // Center crop if aspect ratios don't match
-                float screenAspect = (float)Screen.width / Screen.height;
-                float targetAspect = (float)width / height;
-                
-                Rect sourceRect;
-                if (Mathf.Approximately(screenAspect, targetAspect))
-                {
-                    // Same aspect ratio, capture full screen
-                    sourceRect = new Rect(0, 0, Screen.width, Screen.height);
-                }
-                else if (screenAspect > targetAspect)
-                {
-                    // Screen is wider, crop sides
-                    int cropWidth = Mathf.RoundToInt(Screen.height * targetAspect);
-                    int offsetX = (Screen.width - cropWidth) / 2;
-                    sourceRect = new Rect(offsetX, 0, cropWidth, Screen.height);
-                }
-                else
-                {
-                    // Screen is taller, crop top/bottom
-                    int cropHeight = Mathf.RoundToInt(Screen.width / targetAspect);
-                    int offsetY = (Screen.height - cropHeight) / 2;
-                    sourceRect = new Rect(0, offsetY, Screen.width, cropHeight);
-                }
-                
-                // Create temporary texture at screen resolution
-                Texture2D tempTexture = new Texture2D((int)sourceRect.width, (int)sourceRect.height, TextureFormat.RGB24, false);
-                
-                // Read pixels from screen (this captures everything including UI overlays)
-                tempTexture.ReadPixels(sourceRect, 0, 0, false);
-                tempTexture.Apply();
-                
-                // Scale to target resolution if needed
-                if (tempTexture.width != width || tempTexture.height != height)
-                {
-                    RenderTexture rt = RenderTexture.GetTemporary(width, height, 0, RenderTextureFormat.ARGB32);
-                    Graphics.Blit(tempTexture, rt);
-                    
-                    RenderTexture.active = rt;
-                    readbackTexture.ReadPixels(new Rect(0, 0, width, height), 0, 0);
-                    readbackTexture.Apply();
-                    
-                    RenderTexture.active = null;
-                    RenderTexture.ReleaseTemporary(rt);
-                }
-                else
-                {
-                    Graphics.CopyTexture(tempTexture, readbackTexture);
-                }
-                
-                UnityEngine.Object.Destroy(tempTexture);
-                
+                // Render camera to our capture texture
+                targetCamera.targetTexture = captureTexture;
+                targetCamera.Render();
+
+                // Read pixels from RenderTexture to Texture2D
+                RenderTexture.active = captureTexture;
+                readbackTexture.ReadPixels(new Rect(0, 0, captureTexture.width, captureTexture.height), 0, 0);
+                readbackTexture.Apply();
+
                 // Encode to JPEG
                 byte[] jpegData = readbackTexture.EncodeToJPG(compressionQuality);
-                
+
                 return jpegData;
             }
-            catch (Exception ex)
+            finally
             {
-                Debug.LogError($"FrameCaptureService: Frame capture failed: {ex.Message}");
-                throw;
+                // Restore original render targets
+                targetCamera.targetTexture = originalTarget;
+                RenderTexture.active = originalActive;
             }
         }
         
         /// <summary>
         /// Finds a valid camera in the scene for frame capture.
         /// Prioritizes main camera, then falls back to any active camera.
-        /// Filters out UI-only cameras to capture gameplay.
         /// </summary>
         /// <returns>A valid Camera instance, or null if none found.</returns>
         private Camera FindValidCamera()
         {
-            // Try to find main camera first (usually the gameplay camera)
+            // Try to find main camera first
             Camera mainCamera = Camera.main;
-            if (mainCamera != null && mainCamera.gameObject.activeInHierarchy && mainCamera.enabled)
+            if (mainCamera != null && mainCamera.gameObject.activeInHierarchy)
             {
                 return mainCamera;
             }
             
             // Fall back to any active camera in the scene
-            // Prioritize cameras that render to screen (not UI-only cameras)
             Camera[] allCameras = UnityEngine.Object.FindObjectsOfType<Camera>();
-            Camera bestCamera = null;
-            float highestDepth = float.MinValue;
-            
             foreach (Camera cam in allCameras)
             {
                 if (cam != null && cam.gameObject.activeInHierarchy && cam.enabled)
                 {
-                    // Prefer cameras with higher depth (usually main gameplay cameras)
-                    // Skip cameras that only render UI layers
-                    if (cam.depth > highestDepth)
-                    {
-                        highestDepth = cam.depth;
-                        bestCamera = cam;
-                    }
+                    return cam;
                 }
             }
             
-            if (bestCamera != null)
-            {
-                Debug.Log($"FrameCaptureService: Found camera '{bestCamera.name}' with depth {highestDepth}");
-            }
-            
-            return bestCamera;
+            return null;
         }
 
         /// <summary>
