@@ -27,10 +27,6 @@ public class StreamingDataManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    /// <summary>
-    /// Generates a unique stream domain for the player.
-    /// Format: "stream-{username}-{timestamp}"
-    /// </summary>
     public string GenerateStreamDomain(string username)
     {
         string timestamp = DateTime.UtcNow.Ticks.ToString();
@@ -38,9 +34,6 @@ public class StreamingDataManager : MonoBehaviour
         return domain.ToLower();
     }
 
-    /// <summary>
-    /// Saves stream info to DynamoDB when streaming starts.
-    /// </summary>
     public void SaveStreamInfo(string streamDomain, string sessionId, int currentLevel)
     {
         string playerID = PlayerPrefs.GetString("Username", "UnknownPlayer");
@@ -60,20 +53,13 @@ public class StreamingDataManager : MonoBehaviour
         StartCoroutine(SaveStreamCoroutine(json));
     }
 
-    /// <summary>
-    /// Deletes stream info from DynamoDB when streaming ends.
-    /// </summary>
     public void DeleteStreamInfo(string streamDomain)
     {
         string playerID = PlayerPrefs.GetString("Username", "UnknownPlayer");
-        
         Debug.Log($"Deleting stream info for domain: {streamDomain}");
         StartCoroutine(DeleteStreamCoroutine(streamDomain, playerID));
     }
 
-    /// <summary>
-    /// Retrieves list of active streams from DynamoDB.
-    /// </summary>
     public void GetActiveStreams(Action<StreamInfo[]> callback)
     {
         StartCoroutine(GetActiveStreamsCoroutine(callback));
@@ -82,7 +68,7 @@ public class StreamingDataManager : MonoBehaviour
     private IEnumerator SaveStreamCoroutine(string jsonData)
     {
         string url = apiURL + "/stream-info";
-        
+
         using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
         {
             byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
@@ -93,41 +79,32 @@ public class StreamingDataManager : MonoBehaviour
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.Success)
-            {
                 Debug.Log("Stream info saved successfully: " + request.downloadHandler.text);
-            }
             else
-            {
                 Debug.LogError("Failed to save stream info: " + request.error);
-            }
         }
     }
 
     private IEnumerator DeleteStreamCoroutine(string streamDomain, string playerID)
     {
         string url = $"{apiURL}/stream-info?StreamDomain={streamDomain}&PlayerID={playerID}";
-        
+
         using (UnityWebRequest request = UnityWebRequest.Delete(url))
         {
             request.downloadHandler = new DownloadHandlerBuffer();
-            
             yield return request.SendWebRequest();
 
             if (request.result == UnityWebRequest.Result.Success)
-            {
                 Debug.Log("Stream info deleted successfully");
-            }
             else
-            {
                 Debug.LogError("Failed to delete stream info: " + request.error);
-            }
         }
     }
 
     private IEnumerator GetActiveStreamsCoroutine(Action<StreamInfo[]> callback)
     {
         string url = apiURL + "/active-streams";
-        
+
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
             yield return request.SendWebRequest();

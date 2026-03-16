@@ -1566,7 +1566,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 188166702}
-        m_TargetAssemblyTypeName: MenuNavigator, NewAssembly
+        m_TargetAssemblyTypeName: MenuNavigator, Assembly-CSharp
         m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:

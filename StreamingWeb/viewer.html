@@ -42,26 +42,23 @@
         margin-bottom: 10px;
       }
 
-      .stream-selector {
-        margin: 20px 0;
-        padding: 15px;
-        background: rgba(255, 255, 255, 0.1);
+      .back-btn {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 25px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.4);
         border-radius: 10px;
-      }
-
-      .stream-selector label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: bold;
-      }
-
-      .stream-selector input {
-        width: 100%;
-        padding: 10px;
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.9);
         font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.2s;
+      }
+
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.35);
       }
 
       .status {
@@ -151,15 +148,10 @@
     <div class="container">
       <div class="header">
         <h1>🎮 Game Stream Viewer</h1>
-        <div class="stream-selector">
-          <label for="streamDomain">Stream Domain (optional):</label>
-          <input
-            type="text"
-            id="streamDomain"
-            placeholder="e.g., stream-player1-12345678"
-          />
-        </div>
         <div class="status waiting" id="status">⏳ Waiting for stream...</div>
+        <a href="active-streams.html" class="back-btn"
+          >⬅ Return to Stream List</a
+        >
       </div>
 
       <div class="content">
@@ -197,15 +189,12 @@
 
       async function fetchLatestFrame() {
         try {
-          // Get stream domain from input or URL parameter
+          // Get stream domain from URL parameter
           const urlParams = new URLSearchParams(window.location.search);
-          const streamDomain =
-            document.getElementById("streamDomain").value ||
-            urlParams.get("stream") ||
-            "";
+          const streamDomain = urlParams.get("stream") || "";
 
           // Production API URL
-          let url = "/viewers";
+          let url = "/stream/latest";
           if (streamDomain) {
             url += `?stream=${encodeURIComponent(streamDomain)}`;
           }
@@ -270,13 +259,6 @@
 
       // Start connection
       connectToStream();
-
-      // Pre-fill stream domain from URL parameter if present
-      const urlParams = new URLSearchParams(window.location.search);
-      const streamParam = urlParams.get("stream");
-      if (streamParam) {
-        document.getElementById("streamDomain").value = streamParam;
-      }
     </script>
   </body>
 </html>
