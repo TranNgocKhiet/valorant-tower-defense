@@ -7763,6 +7763,9 @@ MonoBehaviour:
   - name: Astra
     prefab: {fileID: 3637924929354774796, guid: 8aee024a1bf34a64288dd9d66d7158a9, type: 3}
     cost: 125
+  - name: Chamber
+    prefab: {fileID: 3637924929354774796, guid: 5866e9b6d5395cc43a3fe71b6af893e7, type: 3}
+    cost: 200
   - name: Cypher
     prefab: {fileID: 3637924929354774796, guid: 6e307644b4f1b764aa0d5f11956c6202, type: 3}
     cost: 150
