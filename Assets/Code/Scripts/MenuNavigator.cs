@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class MenuNavigator : MonoBehaviour
 {
+    public string streamUrl = "http://13.250.23.170:3000/active-streams.html";
     public void RetryLevel()
     {
         // 1. Reset the game speed to normal 
@@ -92,5 +93,10 @@ public class MenuNavigator : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
+    }
+    public void GoToStreamPage()
+    {
+        // This opens the URL in the user's default browser
+        Application.OpenURL(streamUrl);
     }
 }

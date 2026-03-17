@@ -1536,7 +1536,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &414365437
 Canvas:
   m_ObjectHideFlags: 0
@@ -1546,7 +1546,7 @@ Canvas:
   m_GameObject: {fileID: 414365434}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 2
   m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -1569,7 +1569,7 @@ RectTransform:
   m_GameObject: {fileID: 414365434}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.3333334, y: 1.3333334, z: 1.3333334}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 619417948}
@@ -1585,9 +1585,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 1280, y: 720}
+  m_SizeDelta: {x: 1920, y: 1080}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &414365439
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7763,6 +7763,9 @@ MonoBehaviour:
   - name: Astra
     prefab: {fileID: 3637924929354774796, guid: 8aee024a1bf34a64288dd9d66d7158a9, type: 3}
     cost: 125
+  - name: Chamber
+    prefab: {fileID: 3637924929354774796, guid: 5866e9b6d5395cc43a3fe71b6af893e7, type: 3}
+    cost: 200
   - name: Cypher
     prefab: {fileID: 3637924929354774796, guid: 6e307644b4f1b764aa0d5f11956c6202, type: 3}
     cost: 150
