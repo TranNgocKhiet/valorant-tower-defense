@@ -53,7 +53,22 @@
     });
   });
 
-  // Get latest frame for viewer
+  // Get latest frame for viewer (both endpoints supported)
+  app.get('/viewers', (req, res) => {
+    const streamDomain = req.query.stream;
+    if (streamDomain && activeStreams.has(streamDomain)) {
+      // Return frame for specific stream domain
+      const streamFrame = latestFrame;
+      if (streamFrame) {
+        return res.json({ success: true, frame: streamFrame });
+      }
+    }
+    if (latestFrame) {
+      return res.json({ success: true, frame: latestFrame });
+    }
+    res.json({ success: true, frame: null });
+  });
+
   app.get('/stream/latest', (req, res) => {
     if (latestFrame) {
       res.json({ 
@@ -70,23 +85,24 @@
 
   // Session initialization
   app.post('/stream/init', (req, res) => {
-    const streamDomain = req.body.streamDomain || `stream-${req.body.playerId}-${Date.now()}`;
+    const playerId = req.body.playerId || req.body.PlayerId || 'unknown';
+    const streamDomain = req.body.streamDomain || req.body.StreamDomain || `stream-${playerId}-${Date.now()}`;
     
     sessionData = {
       sessionId: `session-${Date.now()}`,
       streamDomain: streamDomain,
-      playerId: req.body.playerId,
-      gameVersion: req.body.gameVersion,
-      config: req.body.config,
+      playerId: playerId,
+      gameVersion: req.body.gameVersion || req.body.GameVersion,
+      config: req.body.config || req.body.Config,
       startTime: new Date()
     };
     
     // Add to active streams
     activeStreams.set(streamDomain, {
       StreamDomain: streamDomain,
-      PlayerID: req.body.playerId,
+      PlayerID: playerId,
       StreamStartTime: sessionData.startTime.toISOString(),
-      CurrentLevel: req.body.currentLevel || 1,
+      CurrentLevel: req.body.currentLevel || req.body.CurrentLevel || 1,
       Status: 'active',
       SessionId: sessionData.sessionId
     });

@@ -51,6 +51,24 @@ public class MenuNavigator : MonoBehaviour
 
     public void GoToLogin()
     {
+        // Terminate streaming session if active before logging out
+        var streamManager = TowerDefense.Streaming.StreamManager.GetInstance();
+        if (streamManager != null)
+        {
+            var currentState = streamManager.GetConnectionState();
+            if (currentState == TowerDefense.Streaming.Core.ConnectionState.Streaming ||
+                currentState == TowerDefense.Streaming.Core.ConnectionState.Connected ||
+                currentState == TowerDefense.Streaming.Core.ConnectionState.Reconnecting)
+            {
+                Debug.Log("MenuNavigator: Stopping streaming session before logout");
+                streamManager.StopStreaming();
+            }
+        }
+        
+        // Clear authentication tokens
+        PlayerPrefs.DeleteKey("RefreshToken");
+        PlayerPrefs.Save();
+        
         SceneManager.LoadScene("LoginScene");
     }
 

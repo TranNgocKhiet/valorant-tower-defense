@@ -1134,9 +1134,7 @@ namespace TowerDefense.Streaming
         /// </summary>
         private string GetPlayerId()
         {
-            // TODO: Integrate with actual player ID system
-            // For now, use a generated GUID or retrieve from AWS Cognito
-            return SystemInfo.deviceUniqueIdentifier;
+            return PlayerPrefs.GetString("Username", SystemInfo.deviceUniqueIdentifier);
         }
         
         /// <summary>
