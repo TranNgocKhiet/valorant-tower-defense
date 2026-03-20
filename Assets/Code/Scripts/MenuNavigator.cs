@@ -1,3 +1,4 @@
+using TowerDefense.Streaming;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,6 +8,8 @@ using UnityEngine.SceneManagement;
 public class MenuNavigator : MonoBehaviour
 {
     public string streamUrl = "http://13.250.23.170:3000/active-streams.html";
+    [Header("Stream Manager")]
+    [SerializeField] private StreamManager streamManager;
     public void RetryLevel()
     {
         // 1. Reset the game speed to normal 
@@ -85,6 +88,20 @@ public class MenuNavigator : MonoBehaviour
 
     public void QuitGame()
     {
+        // Terminate streaming session if active before logging out
+        var streamManager = TowerDefense.Streaming.StreamManager.GetInstance();
+        if (streamManager != null)
+        {
+            var currentState = streamManager.GetConnectionState();
+            if (currentState == TowerDefense.Streaming.Core.ConnectionState.Streaming ||
+                currentState == TowerDefense.Streaming.Core.ConnectionState.Connected ||
+                currentState == TowerDefense.Streaming.Core.ConnectionState.Reconnecting)
+            {
+                Debug.Log("MenuNavigator: Stopping streaming session before logout");
+                streamManager.StopStreaming();
+            }
+        }
+
         UnityEngine.Debug.Log("Quit Button Pressed!");
 
         // We use UnityEngine.Application to tell Unity EXACTLY which one to use
