@@ -25,7 +25,7 @@
         background: white;
         border-radius: 20px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        max-width: 1200px;
+        max-width: 1400px;
         width: 100%;
         overflow: hidden;
       }
@@ -40,6 +40,25 @@
       .header h1 {
         font-size: 2.5em;
         margin-bottom: 10px;
+      }
+
+      .back-btn {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 25px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        border-radius: 10px;
+        font-size: 1em;
+        font-weight: bold;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.2s;
+      }
+
+      .back-btn:hover {
+        background: rgba(255, 255, 255, 0.35);
       }
 
       .status {
@@ -72,9 +91,6 @@
       }
 
       .content {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 20px;
         padding: 30px;
       }
 
@@ -84,6 +100,8 @@
         overflow: hidden;
         position: relative;
         aspect-ratio: 16/9;
+        max-width: 100%;
+        margin: 0 auto;
       }
 
       #gameFrame {
@@ -107,72 +125,6 @@
         margin-bottom: 20px;
       }
 
-      .stats-section {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-      }
-
-      .stat-card {
-        background: #f3f4f6;
-        border-radius: 12px;
-        padding: 20px;
-        border-left: 4px solid #667eea;
-      }
-
-      .stat-card h3 {
-        color: #4b5563;
-        font-size: 0.9em;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 10px;
-      }
-
-      .stat-value {
-        font-size: 2em;
-        font-weight: bold;
-        color: #1f2937;
-      }
-
-      .game-stats {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-      }
-
-      .game-stat {
-        background: white;
-        padding: 15px;
-        border-radius: 8px;
-        text-align: center;
-      }
-
-      .game-stat-label {
-        color: #6b7280;
-        font-size: 0.85em;
-        margin-bottom: 5px;
-      }
-
-      .game-stat-value {
-        font-size: 1.5em;
-        font-weight: bold;
-        color: #667eea;
-      }
-
-      .session-info {
-        background: #fef3c7;
-        border-left: 4px solid #f59e0b;
-        padding: 15px;
-        border-radius: 8px;
-        margin-top: 10px;
-      }
-
-      .session-info p {
-        color: #78350f;
-        font-size: 0.9em;
-        margin: 5px 0;
-      }
-
       .fps-indicator {
         position: absolute;
         top: 10px;
@@ -187,7 +139,7 @@
 
       @media (max-width: 768px) {
         .content {
-          grid-template-columns: 1fr;
+          padding: 15px;
         }
       }
     </style>
@@ -197,6 +149,9 @@
       <div class="header">
         <h1>🎮 Game Stream Viewer</h1>
         <div class="status waiting" id="status">⏳ Waiting for stream...</div>
+        <a href="active-streams.html" class="back-btn"
+          >⬅ Return to Stream List</a
+        >
       </div>
 
       <div class="content">
@@ -211,48 +166,6 @@
           </div>
           <div class="fps-indicator" id="fpsIndicator" style="display: none">
             0 FPS
-          </div>
-        </div>
-
-        <div class="stats-section">
-          <div class="stat-card">
-            <h3>Session Duration</h3>
-            <div class="stat-value" id="duration">00:00:00</div>
-          </div>
-
-          <div class="stat-card">
-            <h3>Frames Received</h3>
-            <div class="stat-value" id="frameCount">0</div>
-          </div>
-
-          <div class="stat-card">
-            <h3>Game State</h3>
-            <div class="game-stats">
-              <div class="game-stat">
-                <div class="game-stat-label">Wave</div>
-                <div class="game-stat-value" id="wave">-</div>
-              </div>
-              <div class="game-stat">
-                <div class="game-stat-label">Enemies</div>
-                <div class="game-stat-value" id="enemies">-</div>
-              </div>
-              <div class="game-stat">
-                <div class="game-stat-label">Towers</div>
-                <div class="game-stat-value" id="towers">-</div>
-              </div>
-              <div class="game-stat">
-                <div class="game-stat-label">Health</div>
-                <div class="game-stat-value" id="health">-</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="session-info" id="sessionInfo" style="display: none">
-            <p><strong>Session ID:</strong> <span id="sessionId">-</span></p>
-            <p><strong>Player ID:</strong> <span id="playerId">-</span></p>
-            <p>
-              <strong>Game Version:</strong> <span id="gameVersion">-</span>
-            </p>
           </div>
         </div>
       </div>
@@ -276,7 +189,17 @@
 
       async function fetchLatestFrame() {
         try {
-          const response = await fetch("http://localhost:3000/stream/latest");
+          // Get stream domain from URL parameter
+          const urlParams = new URLSearchParams(window.location.search);
+          const streamDomain = urlParams.get("stream") || "";
+
+          // Production API URL
+          let url = "/stream/latest";
+          if (streamDomain) {
+            url += `?stream=${encodeURIComponent(streamDomain)}`;
+          }
+
+          const response = await fetch(url);
           if (response.ok) {
             const data = await response.json();
             if (data.frame) {
@@ -315,40 +238,16 @@
           );
         }
 
-        // Update frame count
+        // Update frame count (internal tracking)
         frameCount++;
-        document.getElementById("frameCount").textContent =
-          frameCount.toLocaleString();
 
         // Update FPS
         fpsCounter++;
         document.getElementById("fpsIndicator").style.display = "block";
 
-        // Update game stats
-        const metadata = frame.metadata || frame.Metadata;
-        if (metadata) {
-          const m = metadata;
-          document.getElementById("wave").textContent =
-            m.currentWave || m.CurrentWave || 0;
-          document.getElementById("enemies").textContent =
-            m.enemyCount || m.EnemyCount || 0;
-          document.getElementById("towers").textContent =
-            m.towerCount || m.TowerCount || 0;
-          document.getElementById("health").textContent =
-            m.playerHealth || m.PlayerHealth || 0;
-        }
-
-        // Update session info
-        if (frame.sessionId && !sessionStartTime) {
+        // Start session timer if not already started
+        if (!sessionStartTime) {
           sessionStartTime = new Date();
-          document.getElementById("sessionInfo").style.display = "block";
-          document.getElementById("sessionId").textContent =
-            frame.sessionId || "-";
-        }
-
-        // Start duration timer if not already started
-        if (!window.durationInterval) {
-          window.durationInterval = setInterval(updateDuration, 1000);
         }
       }
 
@@ -356,20 +255,6 @@
         document.getElementById("fpsIndicator").textContent =
           `${fpsCounter} FPS`;
         fpsCounter = 0;
-      }
-
-      function updateDuration() {
-        if (!sessionStartTime) return;
-
-        const now = new Date();
-        const diff = Math.floor((now - sessionStartTime) / 1000);
-
-        const hours = Math.floor(diff / 3600);
-        const minutes = Math.floor((diff % 3600) / 60);
-        const seconds = diff % 60;
-
-        const formatted = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-        document.getElementById("duration").textContent = formatted;
       }
 
       // Start connection

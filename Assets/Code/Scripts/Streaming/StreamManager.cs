@@ -34,6 +34,7 @@ namespace TowerDefense.Streaming
         private StreamingStats _stats;
         private DateTime _sessionStartTime;
         private string _sessionId;
+        private string _streamDomain;
         
         // Service dependencies
         private ConfigManager _configManager;
@@ -119,33 +120,25 @@ namespace TowerDefense.Streaming
             // Unhook from application quit event
             Application.quitting -= OnApplicationQuitting;
             
-            // Only perform cleanup if we're actually quitting
-            // With DontDestroyOnLoad, OnDestroy should only be called when quitting
-            if (_isQuitting)
+            // Always clean up active streaming sessions on destroy,
+            // even if _isQuitting wasn't set (e.g. editor play mode stopped abruptly)
+            if (_connectionState == ConnectionState.Streaming || 
+                _connectionState == ConnectionState.Connected ||
+                _connectionState == ConnectionState.Reconnecting)
             {
-                Debug.Log("StreamManager: Application is quitting, performing full cleanup");
-                
-                if (_connectionState == ConnectionState.Streaming || 
-                    _connectionState == ConnectionState.Connected ||
-                    _connectionState == ConnectionState.Reconnecting)
-                {
-                    // Can't use coroutines during quit
-                    StopAllCoroutines();
-                    CleanupResources();
-                    _connectionState = ConnectionState.Idle;
-                }
-                
-                // Dispose frame capture service
-                if (_frameCaptureService != null)
-                {
-                    Debug.Log("StreamManager: Disposing FrameCaptureService");
-                    _frameCaptureService.Dispose();
-                    _frameCaptureService = null;
-                }
+                Debug.Log("StreamManager: Cleaning up active streaming session on destroy");
+                StopAllCoroutines();
+                TerminateSessionSync();
+                CleanupResources();
+                _connectionState = ConnectionState.Idle;
             }
-            else
+            
+            // Dispose frame capture service
+            if (_frameCaptureService != null)
             {
-                Debug.LogWarning("StreamManager: OnDestroy called but not quitting - this shouldn't happen with DontDestroyOnLoad!");
+                Debug.Log("StreamManager: Disposing FrameCaptureService");
+                _frameCaptureService.Dispose();
+                _frameCaptureService = null;
             }
         }
         
@@ -162,12 +155,61 @@ namespace TowerDefense.Streaming
                 _connectionState == ConnectionState.Connected ||
                 _connectionState == ConnectionState.Reconnecting)
             {
-                // Synchronously terminate the session since we're quitting
-                // We can't use coroutines during application quit
                 StopAllCoroutines();
+                
+                // Synchronously clean up stream info and notify server before quit
+                TerminateSessionSync();
+                
                 CleanupResources();
                 _connectionState = ConnectionState.Idle;
             }
+        }
+        
+        /// <summary>
+        /// Synchronously terminates the streaming session. Used during application quit
+        /// when coroutines cannot run (e.g. exiting play mode in Unity Editor).
+        /// </summary>
+        private void TerminateSessionSync()
+        {
+            // Delete stream info from DynamoDB via sync HTTP call
+            if (!string.IsNullOrEmpty(_streamDomain))
+            {
+                StreamingDataManager.Instance?.DeleteStreamInfoSync(_streamDomain);
+                Debug.Log($"StreamManager: Sync deleted stream info for domain: {_streamDomain}");
+            }
+            
+            // Send terminate to streaming server
+            if (!string.IsNullOrEmpty(_config?.ApiEndpointUrl))
+            {
+                try
+                {
+                    string url = $"{_config.ApiEndpointUrl.TrimEnd('/')}/stream/terminate";
+                    var request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(url);
+                    request.Method = "POST";
+                    request.ContentType = "application/json";
+                    request.Timeout = 3000;
+                    
+                    string json = $"{{\"sessionId\":\"{_sessionId}\",\"streamDomain\":\"{_streamDomain}\"}}";
+                    byte[] body = System.Text.Encoding.UTF8.GetBytes(json);
+                    request.ContentLength = body.Length;
+                    
+                    using (var stream = request.GetRequestStream())
+                    {
+                        stream.Write(body, 0, body.Length);
+                    }
+                    
+                    using (var response = (System.Net.HttpWebResponse)request.GetResponse())
+                    {
+                        Debug.Log($"StreamManager: Sync terminate sent, status: {response.StatusCode}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"StreamManager: Sync terminate failed: {e.Message}");
+                }
+            }
+            
+            _streamDomain = null;
         }
         
         #endregion
@@ -542,7 +584,7 @@ namespace TowerDefense.Streaming
             };
             
             // Requirement 1.1: Establish connection within 5 seconds
-            float timeout = 5f;
+            float timeout = 10;
             float elapsed = 0f;
             bool connectionSucceeded = false;
             
@@ -581,6 +623,18 @@ namespace TowerDefense.Streaming
             _sessionId = GetSessionIdFromTransmissionService();
             
             Debug.Log($"StreamManager: Connection established successfully. Session ID: {_sessionId}");
+            
+            // Generate stream domain if not already set
+            if (string.IsNullOrEmpty(_streamDomain))
+            {
+                string username = PlayerPrefs.GetString("Username", "UnknownPlayer");
+                _streamDomain = StreamingDataManager.Instance?.GenerateStreamDomain(username) ?? $"stream-{username}-{DateTime.UtcNow.Ticks}";
+                Debug.Log($"StreamManager: Generated stream domain: {_streamDomain}");
+            }
+            
+            // Save stream info to DynamoDB
+            int currentLevel = PlayerPrefs.GetInt("CurrentLevel", 1);
+            StreamingDataManager.Instance?.SaveStreamInfo(_streamDomain, _sessionId, currentLevel);
             
             // Transition to streaming state
             TransitionToState(ConnectionState.Streaming);
@@ -871,28 +925,9 @@ namespace TowerDefense.Streaming
                     _stats.MemoryUsageMB = _frameBuffer.MemoryUsageMB;
                     Debug.Log($"StreamManager: Memory usage after reduction: {_stats.MemoryUsageMB:F2} MB");
                 }
-                
-                // Requirement 10.4: Adaptive frame rate reduction when CPU exceeds 15%
-                if (cpuUsage > CPU_THRESHOLD_PERCENT)
-                {
-                    int currentFrameRate = _config.FrameRate;
-                    int newFrameRate = Mathf.Max(MIN_FRAME_RATE, currentFrameRate - FRAME_RATE_REDUCTION_STEP);
-                    
-                    if (newFrameRate < currentFrameRate)
-                    {
-                        Debug.LogWarning($"StreamManager: CPU usage high ({cpuUsage:F2}%), reducing frame rate from {currentFrameRate} to {newFrameRate} FPS");
-                        
-                        _config.FrameRate = newFrameRate;
-                        _frameCaptureService.SetFrameRate(newFrameRate);
-                        _frameBuffer.SetFrameRate(newFrameRate);
-                        _stats.CurrentFrameRate = newFrameRate;
-                        
-                        // Save the adjusted configuration
-                        _configManager.SaveConfig(_config);
-                    }
-                }
-                
+                                
                 // Update stats
+                UpdateSessionDuration();
                 OnStatsUpdated?.Invoke(_stats);
                 
                 // Wait for next monitoring interval
@@ -960,10 +995,23 @@ namespace TowerDefense.Streaming
             // Calculate frame interval based on configured frame rate
             // Requirement 2.1: Capture frames at configurable frame rate
             float frameInterval = 1f / _config.FrameRate;
+            float lastCaptureTime = Time.realtimeSinceStartup;
             
             while (_connectionState == ConnectionState.Streaming || _connectionState == ConnectionState.Reconnecting)
             {
-                float frameStartTime = Time.time;
+                // Wait for end of frame to ensure all rendering (including UI overlays) is complete
+                // Use WaitForEndOfFrame which works even when Time.timeScale = 0 (paused)
+                yield return new WaitForEndOfFrame();
+                
+                // Check if enough time has passed for the next frame (using real time, not game time)
+                float currentTime = Time.realtimeSinceStartup;
+                if (currentTime - lastCaptureTime < frameInterval)
+                {
+                    // Not time for next frame yet, skip this frame
+                    continue;
+                }
+                
+                lastCaptureTime = currentTime;
                 
                 // Requirement 2.1: Capture gameplay frame
                 GameplayFrame rawFrame = null;
@@ -981,7 +1029,7 @@ namespace TowerDefense.Streaming
                 {
                     // Assign sequence number
                     rawFrame.SequenceNumber = sequenceNumber++;
-                    
+                    rawFrame.StreamDomain = _streamDomain;
                     // Requirement 3.1: Encode frame asynchronously
                     var encodeTask = _frameEncoder.EncodeAsync(rawFrame);
                     
@@ -1024,14 +1072,8 @@ namespace TowerDefense.Streaming
                 }
                 
                 // Update stats
+                UpdateSessionDuration();
                 OnStatsUpdated?.Invoke(_stats);
-                
-                // Wait for next frame interval
-                // Requirement 2.1: Maintain configured frame rate
-                float frameProcessingTime = Time.time - frameStartTime;
-                float waitTime = Mathf.Max(0, frameInterval - frameProcessingTime);
-                
-                yield return new WaitForSeconds(waitTime);
             }
             
             Debug.Log("StreamManager: Frame capture and transmission loop stopped");
@@ -1135,9 +1177,7 @@ namespace TowerDefense.Streaming
         /// </summary>
         private string GetPlayerId()
         {
-            // TODO: Integrate with actual player ID system
-            // For now, use a generated GUID or retrieve from AWS Cognito
-            return SystemInfo.deviceUniqueIdentifier;
+            return PlayerPrefs.GetString("Username", SystemInfo.deviceUniqueIdentifier);
         }
         
         /// <summary>
@@ -1349,8 +1389,20 @@ namespace TowerDefense.Streaming
                 }
                 else
                 {
-                    Debug.LogWarning("StreamManager: Failed to get auth token for termination message");
+                    Debug.LogWarning("StreamManager: Failed to get auth token for termination");
                 }
+                
+                // Delete stream info from DynamoDB
+                if (!string.IsNullOrEmpty(_streamDomain))
+                {
+                    StreamingDataManager.Instance?.DeleteStreamInfo(_streamDomain);
+                    Debug.Log($"StreamManager: Deleted stream info for domain: {_streamDomain}");
+                    _streamDomain = null;
+                }
+            }
+            else
+            {
+                Debug.LogWarning("StreamManager: No session ID to terminate");
             }
             
             // Requirement 5.2, 5.3, 5.4: Cleanup resources and transition to idle

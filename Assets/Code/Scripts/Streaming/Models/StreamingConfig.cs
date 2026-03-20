@@ -12,7 +12,7 @@ namespace TowerDefense.Streaming.Models
         /// Hardcoded API endpoint URL for streaming.
         /// TODO: Replace with production API endpoint when ready.
         /// </summary>
-        public const string DEFAULT_API_ENDPOINT = "http://localhost:3000";
+        public const string DEFAULT_API_ENDPOINT = "https://ptf00pe25j.execute-api.ap-southeast-1.amazonaws.com";
         
         /// <summary>API endpoint URL for streaming data transmission.</summary>
         public string ApiEndpointUrl { get; set; }
