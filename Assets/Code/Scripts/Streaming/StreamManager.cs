@@ -120,33 +120,25 @@ namespace TowerDefense.Streaming
             // Unhook from application quit event
             Application.quitting -= OnApplicationQuitting;
             
-            // Only perform cleanup if we're actually quitting
-            // With DontDestroyOnLoad, OnDestroy should only be called when quitting
-            if (_isQuitting)
+            // Always clean up active streaming sessions on destroy,
+            // even if _isQuitting wasn't set (e.g. editor play mode stopped abruptly)
+            if (_connectionState == ConnectionState.Streaming || 
+                _connectionState == ConnectionState.Connected ||
+                _connectionState == ConnectionState.Reconnecting)
             {
-                Debug.Log("StreamManager: Application is quitting, performing full cleanup");
-                
-                if (_connectionState == ConnectionState.Streaming || 
-                    _connectionState == ConnectionState.Connected ||
-                    _connectionState == ConnectionState.Reconnecting)
-                {
-                    // Can't use coroutines during quit
-                    StopAllCoroutines();
-                    CleanupResources();
-                    _connectionState = ConnectionState.Idle;
-                }
-                
-                // Dispose frame capture service
-                if (_frameCaptureService != null)
-                {
-                    Debug.Log("StreamManager: Disposing FrameCaptureService");
-                    _frameCaptureService.Dispose();
-                    _frameCaptureService = null;
-                }
+                Debug.Log("StreamManager: Cleaning up active streaming session on destroy");
+                StopAllCoroutines();
+                TerminateSessionSync();
+                CleanupResources();
+                _connectionState = ConnectionState.Idle;
             }
-            else
+            
+            // Dispose frame capture service
+            if (_frameCaptureService != null)
             {
-                Debug.LogWarning("StreamManager: OnDestroy called but not quitting - this shouldn't happen with DontDestroyOnLoad!");
+                Debug.Log("StreamManager: Disposing FrameCaptureService");
+                _frameCaptureService.Dispose();
+                _frameCaptureService = null;
             }
         }
         
@@ -163,12 +155,61 @@ namespace TowerDefense.Streaming
                 _connectionState == ConnectionState.Connected ||
                 _connectionState == ConnectionState.Reconnecting)
             {
-                // Synchronously terminate the session since we're quitting
-                // We can't use coroutines during application quit
                 StopAllCoroutines();
+                
+                // Synchronously clean up stream info and notify server before quit
+                TerminateSessionSync();
+                
                 CleanupResources();
                 _connectionState = ConnectionState.Idle;
             }
+        }
+        
+        /// <summary>
+        /// Synchronously terminates the streaming session. Used during application quit
+        /// when coroutines cannot run (e.g. exiting play mode in Unity Editor).
+        /// </summary>
+        private void TerminateSessionSync()
+        {
+            // Delete stream info from DynamoDB via sync HTTP call
+            if (!string.IsNullOrEmpty(_streamDomain))
+            {
+                StreamingDataManager.Instance?.DeleteStreamInfoSync(_streamDomain);
+                Debug.Log($"StreamManager: Sync deleted stream info for domain: {_streamDomain}");
+            }
+            
+            // Send terminate to streaming server
+            if (!string.IsNullOrEmpty(_config?.ApiEndpointUrl))
+            {
+                try
+                {
+                    string url = $"{_config.ApiEndpointUrl.TrimEnd('/')}/stream/terminate";
+                    var request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(url);
+                    request.Method = "POST";
+                    request.ContentType = "application/json";
+                    request.Timeout = 3000;
+                    
+                    string json = $"{{\"sessionId\":\"{_sessionId}\",\"streamDomain\":\"{_streamDomain}\"}}";
+                    byte[] body = System.Text.Encoding.UTF8.GetBytes(json);
+                    request.ContentLength = body.Length;
+                    
+                    using (var stream = request.GetRequestStream())
+                    {
+                        stream.Write(body, 0, body.Length);
+                    }
+                    
+                    using (var response = (System.Net.HttpWebResponse)request.GetResponse())
+                    {
+                        Debug.Log($"StreamManager: Sync terminate sent, status: {response.StatusCode}");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"StreamManager: Sync terminate failed: {e.Message}");
+                }
+            }
+            
+            _streamDomain = null;
         }
         
         #endregion
@@ -886,6 +927,7 @@ namespace TowerDefense.Streaming
                 }
                                 
                 // Update stats
+                UpdateSessionDuration();
                 OnStatsUpdated?.Invoke(_stats);
                 
                 // Wait for next monitoring interval
@@ -1030,6 +1072,7 @@ namespace TowerDefense.Streaming
                 }
                 
                 // Update stats
+                UpdateSessionDuration();
                 OnStatsUpdated?.Invoke(_stats);
             }
             

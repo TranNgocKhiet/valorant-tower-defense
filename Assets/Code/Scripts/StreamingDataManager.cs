@@ -60,6 +60,31 @@ public class StreamingDataManager : MonoBehaviour
         StartCoroutine(DeleteStreamCoroutine(streamDomain, playerID));
     }
 
+    /// <summary>
+    /// Synchronously deletes stream info. Use during application quit when coroutines can't run.
+    /// </summary>
+    public void DeleteStreamInfoSync(string streamDomain)
+    {
+        string playerID = PlayerPrefs.GetString("Username", "UnknownPlayer");
+        string url = $"{apiURL}/stream-info?StreamDomain={streamDomain}&PlayerID={playerID}";
+        Debug.Log($"Sync deleting stream info for domain: {streamDomain}");
+
+        try
+        {
+            var request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(url);
+            request.Method = "DELETE";
+            request.Timeout = 3000;
+            using (var response = (System.Net.HttpWebResponse)request.GetResponse())
+            {
+                Debug.Log($"Stream info sync deleted, status: {response.StatusCode}");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to sync delete stream info: {e.Message}");
+        }
+    }
+
     public void GetActiveStreams(Action<StreamInfo[]> callback)
     {
         StartCoroutine(GetActiveStreamsCoroutine(callback));
